@@ -10,33 +10,119 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PanelRouteImport } from './routes/_panel'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
+import { Route as PanelDocumentosRouteImport } from './routes/_panel.documentos'
+import { Route as PanelMantencionesRouteImport } from './routes/_panel.mantenciones'
+import { Route as PanelPanelRouteImport } from './routes/_panel.panel'
+import { Route as PanelVehiculosRouteImport } from './routes/_panel.vehiculos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PanelRoute = PanelRouteImport.update({
+  id: '/_panel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComoFuncionaRoute = ComoFuncionaRouteImport.update({
+  id: '/como-funciona',
+  path: '/como-funciona',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanelDocumentosRoute = PanelDocumentosRouteImport.update({
+  id: '/documentos',
+  path: '/documentos',
+  getParentRoute: () => PanelRoute,
+} as any)
+const PanelMantencionesRoute = PanelMantencionesRouteImport.update({
+  id: '/mantenciones',
+  path: '/mantenciones',
+  getParentRoute: () => PanelRoute,
+} as any)
+const PanelPanelRoute = PanelPanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
+  getParentRoute: () => PanelRoute,
+} as any)
+const PanelVehiculosRoute = PanelVehiculosRouteImport.update({
+  id: '/vehiculos',
+  path: '/vehiculos',
+  getParentRoute: () => PanelRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/como-funciona': typeof ComoFuncionaRoute
+  '/documentos': typeof PanelDocumentosRoute
+  '/mantenciones': typeof PanelMantencionesRoute
+  '/panel': typeof PanelPanelRoute
+  '/vehiculos': typeof PanelVehiculosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/como-funciona': typeof ComoFuncionaRoute
+  '/documentos': typeof PanelDocumentosRoute
+  '/mantenciones': typeof PanelMantencionesRoute
+  '/panel': typeof PanelPanelRoute
+  '/vehiculos': typeof PanelVehiculosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_panel': typeof PanelRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/como-funciona': typeof ComoFuncionaRoute
+  '/_panel/documentos': typeof PanelDocumentosRoute
+  '/_panel/mantenciones': typeof PanelMantencionesRoute
+  '/_panel/panel': typeof PanelPanelRoute
+  '/_panel/vehiculos': typeof PanelVehiculosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/como-funciona'
+    | '/documentos'
+    | '/mantenciones'
+    | '/panel'
+    | '/vehiculos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/como-funciona'
+    | '/documentos'
+    | '/mantenciones'
+    | '/panel'
+    | '/vehiculos'
+  id:
+    | '__root__'
+    | '/'
+    | '/_panel'
+    | '/auth'
+    | '/como-funciona'
+    | '/_panel/documentos'
+    | '/_panel/mantenciones'
+    | '/_panel/panel'
+    | '/_panel/vehiculos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PanelRoute: typeof PanelRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ComoFuncionaRoute: typeof ComoFuncionaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +134,79 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_panel': {
+      id: '/_panel'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof PanelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/como-funciona': {
+      id: '/como-funciona'
+      path: '/como-funciona'
+      fullPath: '/como-funciona'
+      preLoaderRoute: typeof ComoFuncionaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_panel/documentos': {
+      id: '/_panel/documentos'
+      path: '/documentos'
+      fullPath: '/documentos'
+      preLoaderRoute: typeof PanelDocumentosRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/_panel/mantenciones': {
+      id: '/_panel/mantenciones'
+      path: '/mantenciones'
+      fullPath: '/mantenciones'
+      preLoaderRoute: typeof PanelMantencionesRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/_panel/panel': {
+      id: '/_panel/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof PanelPanelRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/_panel/vehiculos': {
+      id: '/_panel/vehiculos'
+      path: '/vehiculos'
+      fullPath: '/vehiculos'
+      preLoaderRoute: typeof PanelVehiculosRouteImport
+      parentRoute: typeof PanelRoute
+    }
   }
 }
 
+interface PanelRouteChildren {
+  PanelDocumentosRoute: typeof PanelDocumentosRoute
+  PanelMantencionesRoute: typeof PanelMantencionesRoute
+  PanelPanelRoute: typeof PanelPanelRoute
+  PanelVehiculosRoute: typeof PanelVehiculosRoute
+}
+
+const PanelRouteChildren: PanelRouteChildren = {
+  PanelDocumentosRoute: PanelDocumentosRoute,
+  PanelMantencionesRoute: PanelMantencionesRoute,
+  PanelPanelRoute: PanelPanelRoute,
+  PanelVehiculosRoute: PanelVehiculosRoute,
+}
+
+const PanelRouteWithChildren = PanelRoute._addFileChildren(PanelRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PanelRoute: PanelRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ComoFuncionaRoute: ComoFuncionaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

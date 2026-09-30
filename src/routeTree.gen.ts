@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PanelRouteImport } from './routes/_panel'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
+import { Route as PanelDocumentosRouteImport } from './routes/_panel.documentos'
+import { Route as PanelMantencionesRouteImport } from './routes/_panel.mantenciones'
 import { Route as PanelPanelRouteImport } from './routes/_panel.panel'
 import { Route as PanelVehiculosRouteImport } from './routes/_panel.vehiculos'
 
@@ -35,6 +37,16 @@ const ComoFuncionaRoute = ComoFuncionaRouteImport.update({
   path: '/como-funciona',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PanelDocumentosRoute = PanelDocumentosRouteImport.update({
+  id: '/documentos',
+  path: '/documentos',
+  getParentRoute: () => PanelRoute,
+} as any)
+const PanelMantencionesRoute = PanelMantencionesRouteImport.update({
+  id: '/mantenciones',
+  path: '/mantenciones',
+  getParentRoute: () => PanelRoute,
+} as any)
 const PanelPanelRoute = PanelPanelRouteImport.update({
   id: '/panel',
   path: '/panel',
@@ -50,6 +62,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/documentos': typeof PanelDocumentosRoute
+  '/mantenciones': typeof PanelMantencionesRoute
   '/panel': typeof PanelPanelRoute
   '/vehiculos': typeof PanelVehiculosRoute
 }
@@ -57,6 +71,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/documentos': typeof PanelDocumentosRoute
+  '/mantenciones': typeof PanelMantencionesRoute
   '/panel': typeof PanelPanelRoute
   '/vehiculos': typeof PanelVehiculosRoute
 }
@@ -66,20 +82,38 @@ export interface FileRoutesById {
   '/_panel': typeof PanelRouteWithChildren
   '/auth': typeof AuthRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/_panel/documentos': typeof PanelDocumentosRoute
+  '/_panel/mantenciones': typeof PanelMantencionesRoute
   '/_panel/panel': typeof PanelPanelRoute
   '/_panel/vehiculos': typeof PanelVehiculosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/como-funciona' | '/panel' | '/vehiculos'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/como-funciona'
+    | '/documentos'
+    | '/mantenciones'
+    | '/panel'
+    | '/vehiculos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/como-funciona' | '/panel' | '/vehiculos'
+  to:
+    | '/'
+    | '/auth'
+    | '/como-funciona'
+    | '/documentos'
+    | '/mantenciones'
+    | '/panel'
+    | '/vehiculos'
   id:
     | '__root__'
     | '/'
     | '/_panel'
     | '/auth'
     | '/como-funciona'
+    | '/_panel/documentos'
+    | '/_panel/mantenciones'
     | '/_panel/panel'
     | '/_panel/vehiculos'
   fileRoutesById: FileRoutesById
@@ -121,6 +155,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComoFuncionaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_panel/documentos': {
+      id: '/_panel/documentos'
+      path: '/documentos'
+      fullPath: '/documentos'
+      preLoaderRoute: typeof PanelDocumentosRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/_panel/mantenciones': {
+      id: '/_panel/mantenciones'
+      path: '/mantenciones'
+      fullPath: '/mantenciones'
+      preLoaderRoute: typeof PanelMantencionesRouteImport
+      parentRoute: typeof PanelRoute
+    }
     '/_panel/panel': {
       id: '/_panel/panel'
       path: '/panel'
@@ -139,11 +187,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface PanelRouteChildren {
+  PanelDocumentosRoute: typeof PanelDocumentosRoute
+  PanelMantencionesRoute: typeof PanelMantencionesRoute
   PanelPanelRoute: typeof PanelPanelRoute
   PanelVehiculosRoute: typeof PanelVehiculosRoute
 }
 
 const PanelRouteChildren: PanelRouteChildren = {
+  PanelDocumentosRoute: PanelDocumentosRoute,
+  PanelMantencionesRoute: PanelMantencionesRoute,
   PanelPanelRoute: PanelPanelRoute,
   PanelVehiculosRoute: PanelVehiculosRoute,
 }

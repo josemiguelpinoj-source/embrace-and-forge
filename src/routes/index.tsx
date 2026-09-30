@@ -105,7 +105,7 @@ function Landing() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <Link to="/talleres-info">Cómo funciona</Link>
+              <Link to="/como-funciona">Cómo funciona</Link>
             </Button>
           </div>
         </div>

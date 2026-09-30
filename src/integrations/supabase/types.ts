@@ -14,16 +14,235 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      auditoria: {
+        Row: {
+          accion: string
+          created_at: string
+          detalle: Json
+          entidad: string
+          entidad_id: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          accion: string
+          created_at?: string
+          detalle?: Json
+          entidad: string
+          entidad_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          accion?: string
+          created_at?: string
+          detalle?: Json
+          entidad?: string
+          entidad_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      documentos: {
+        Row: {
+          created_at: string
+          fecha_vencimiento: string | null
+          id: string
+          mime_type: string
+          nombre: string
+          storage_path: string
+          tamano_bytes: number
+          tipo: string
+          user_id: string
+          vehiculo_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          fecha_vencimiento?: string | null
+          id?: string
+          mime_type: string
+          nombre: string
+          storage_path: string
+          tamano_bytes: number
+          tipo: string
+          user_id: string
+          vehiculo_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          fecha_vencimiento?: string | null
+          id?: string
+          mime_type?: string
+          nombre?: string
+          storage_path?: string
+          tamano_bytes?: number
+          tipo?: string
+          user_id?: string
+          vehiculo_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_vehiculo_id_fkey"
+            columns: ["vehiculo_id"]
+            isOneToOne: false
+            referencedRelation: "vehiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mantenciones: {
+        Row: {
+          costo: number | null
+          created_at: string
+          descripcion: string | null
+          fecha: string
+          id: string
+          kilometraje: number
+          proxima_fecha: string | null
+          proximo_km: number | null
+          taller: string | null
+          tipo: string
+          updated_at: string
+          user_id: string
+          vehiculo_id: string
+        }
+        Insert: {
+          costo?: number | null
+          created_at?: string
+          descripcion?: string | null
+          fecha: string
+          id?: string
+          kilometraje: number
+          proxima_fecha?: string | null
+          proximo_km?: number | null
+          taller?: string | null
+          tipo: string
+          updated_at?: string
+          user_id: string
+          vehiculo_id: string
+        }
+        Update: {
+          costo?: number | null
+          created_at?: string
+          descripcion?: string | null
+          fecha?: string
+          id?: string
+          kilometraje?: number
+          proxima_fecha?: string | null
+          proximo_km?: number | null
+          taller?: string | null
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+          vehiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mantenciones_vehiculo_id_fkey"
+            columns: ["vehiculo_id"]
+            isOneToOne: false
+            referencedRelation: "vehiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string | null
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          nombre?: string | null
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string | null
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vehiculos: {
+        Row: {
+          anio: number
+          color: string | null
+          created_at: string
+          id: string
+          kilometraje: number
+          marca: string
+          modelo: string
+          patente: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anio: number
+          color?: string | null
+          created_at?: string
+          id?: string
+          kilometraje?: number
+          marca: string
+          modelo: string
+          patente: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anio?: number
+          color?: string | null
+          created_at?: string
+          id?: string
+          kilometraje?: number
+          marca?: string
+          modelo?: string
+          patente?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +369,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

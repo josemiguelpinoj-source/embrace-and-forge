@@ -32,7 +32,7 @@ function renderLinea(l: string, i: number) {
     return (
       <label key={i} className="flex items-start gap-2 py-0.5">
         <input type="checkbox" defaultChecked={casilla[1] !== " "} className="mt-1 accent-primary" />
-        <span>{negrita(casilla[2])}</span>
+        <span>{negrita(casilla[2] ?? "")}</span>
       </label>
     );
   if (/^#{1,4}\s/.test(l)) return <h3 key={i} className="mt-4 font-display font-semibold">{negrita(l.replace(/^#+\s/, ""))}</h3>;
@@ -49,7 +49,7 @@ function ChecklistPage() {
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
-    if (f.sintomas.trim().length < 10) return toast.error("Describe los síntomas (mínimo 10 caracteres).");
+    if (f.sintomas.trim().length < 10) { toast.error("Describe los síntomas (mínimo 10 caracteres)."); return; }
     setCargando(true);
     setRes(null);
     try {

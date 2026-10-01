@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PanelRouteImport } from './routes/_panel'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
+import { Route as PanelChecklistRouteImport } from './routes/_panel.checklist'
 import { Route as PanelDocumentosRouteImport } from './routes/_panel.documentos'
 import { Route as PanelMantencionesRouteImport } from './routes/_panel.mantenciones'
 import { Route as PanelPanelRouteImport } from './routes/_panel.panel'
@@ -37,6 +38,11 @@ const ComoFuncionaRoute = ComoFuncionaRouteImport.update({
   id: '/como-funciona',
   path: '/como-funciona',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PanelChecklistRoute = PanelChecklistRouteImport.update({
+  id: '/checklist',
+  path: '/checklist',
+  getParentRoute: () => PanelRoute,
 } as any)
 const PanelDocumentosRoute = PanelDocumentosRouteImport.update({
   id: '/documentos',
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/checklist': typeof PanelChecklistRoute
   '/documentos': typeof PanelDocumentosRoute
   '/mantenciones': typeof PanelMantencionesRoute
   '/panel': typeof PanelPanelRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/checklist': typeof PanelChecklistRoute
   '/documentos': typeof PanelDocumentosRoute
   '/mantenciones': typeof PanelMantencionesRoute
   '/panel': typeof PanelPanelRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/_panel': typeof PanelRouteWithChildren
   '/auth': typeof AuthRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/_panel/checklist': typeof PanelChecklistRoute
   '/_panel/documentos': typeof PanelDocumentosRoute
   '/_panel/mantenciones': typeof PanelMantencionesRoute
   '/_panel/panel': typeof PanelPanelRoute
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/como-funciona'
+    | '/checklist'
     | '/documentos'
     | '/mantenciones'
     | '/panel'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/como-funciona'
+    | '/checklist'
     | '/documentos'
     | '/mantenciones'
     | '/panel'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/_panel'
     | '/auth'
     | '/como-funciona'
+    | '/_panel/checklist'
     | '/_panel/documentos'
     | '/_panel/mantenciones'
     | '/_panel/panel'
@@ -167,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComoFuncionaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_panel/checklist': {
+      id: '/_panel/checklist'
+      path: '/checklist'
+      fullPath: '/checklist'
+      preLoaderRoute: typeof PanelChecklistRouteImport
+      parentRoute: typeof PanelRoute
+    }
     '/_panel/documentos': {
       id: '/_panel/documentos'
       path: '/documentos'
@@ -206,6 +225,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface PanelRouteChildren {
+  PanelChecklistRoute: typeof PanelChecklistRoute
   PanelDocumentosRoute: typeof PanelDocumentosRoute
   PanelMantencionesRoute: typeof PanelMantencionesRoute
   PanelPanelRoute: typeof PanelPanelRoute
@@ -214,6 +234,7 @@ interface PanelRouteChildren {
 }
 
 const PanelRouteChildren: PanelRouteChildren = {
+  PanelChecklistRoute: PanelChecklistRoute,
   PanelDocumentosRoute: PanelDocumentosRoute,
   PanelMantencionesRoute: PanelMantencionesRoute,
   PanelPanelRoute: PanelPanelRoute,

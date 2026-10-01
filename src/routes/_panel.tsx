@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Car, FileLock2, Gauge, LayoutDashboard, LogOut, MapPin, Wrench } from "lucide-react";
+import { Car, ClipboardCheck, FileLock2, Gauge, LayoutDashboard, LogOut, MapPin, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ const nav = [
   { to: "/mantenciones", label: "Mantenciones", icon: Wrench },
   { to: "/documentos", label: "Documentos", icon: FileLock2 },
   { to: "/talleres", label: "Talleres", icon: MapPin },
+  { to: "/checklist", label: "Checklist IA", icon: ClipboardCheck },
 ] as const;
 
 function PanelLayout() {

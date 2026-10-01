@@ -16,6 +16,7 @@ import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
 import { Route as PanelDocumentosRouteImport } from './routes/_panel.documentos'
 import { Route as PanelMantencionesRouteImport } from './routes/_panel.mantenciones'
 import { Route as PanelPanelRouteImport } from './routes/_panel.panel'
+import { Route as PanelTalleresRouteImport } from './routes/_panel.talleres'
 import { Route as PanelVehiculosRouteImport } from './routes/_panel.vehiculos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -52,6 +53,11 @@ const PanelPanelRoute = PanelPanelRouteImport.update({
   path: '/panel',
   getParentRoute: () => PanelRoute,
 } as any)
+const PanelTalleresRoute = PanelTalleresRouteImport.update({
+  id: '/talleres',
+  path: '/talleres',
+  getParentRoute: () => PanelRoute,
+} as any)
 const PanelVehiculosRoute = PanelVehiculosRouteImport.update({
   id: '/vehiculos',
   path: '/vehiculos',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/documentos': typeof PanelDocumentosRoute
   '/mantenciones': typeof PanelMantencionesRoute
   '/panel': typeof PanelPanelRoute
+  '/talleres': typeof PanelTalleresRoute
   '/vehiculos': typeof PanelVehiculosRoute
 }
 export interface FileRoutesByTo {
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/documentos': typeof PanelDocumentosRoute
   '/mantenciones': typeof PanelMantencionesRoute
   '/panel': typeof PanelPanelRoute
+  '/talleres': typeof PanelTalleresRoute
   '/vehiculos': typeof PanelVehiculosRoute
 }
 export interface FileRoutesById {
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/_panel/documentos': typeof PanelDocumentosRoute
   '/_panel/mantenciones': typeof PanelMantencionesRoute
   '/_panel/panel': typeof PanelPanelRoute
+  '/_panel/talleres': typeof PanelTalleresRoute
   '/_panel/vehiculos': typeof PanelVehiculosRoute
 }
 export interface FileRouteTypes {
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/mantenciones'
     | '/panel'
+    | '/talleres'
     | '/vehiculos'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/mantenciones'
     | '/panel'
+    | '/talleres'
     | '/vehiculos'
   id:
     | '__root__'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/_panel/documentos'
     | '/_panel/mantenciones'
     | '/_panel/panel'
+    | '/_panel/talleres'
     | '/_panel/vehiculos'
   fileRoutesById: FileRoutesById
 }
@@ -176,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PanelPanelRouteImport
       parentRoute: typeof PanelRoute
     }
+    '/_panel/talleres': {
+      id: '/_panel/talleres'
+      path: '/talleres'
+      fullPath: '/talleres'
+      preLoaderRoute: typeof PanelTalleresRouteImport
+      parentRoute: typeof PanelRoute
+    }
     '/_panel/vehiculos': {
       id: '/_panel/vehiculos'
       path: '/vehiculos'
@@ -190,6 +209,7 @@ interface PanelRouteChildren {
   PanelDocumentosRoute: typeof PanelDocumentosRoute
   PanelMantencionesRoute: typeof PanelMantencionesRoute
   PanelPanelRoute: typeof PanelPanelRoute
+  PanelTalleresRoute: typeof PanelTalleresRoute
   PanelVehiculosRoute: typeof PanelVehiculosRoute
 }
 
@@ -197,6 +217,7 @@ const PanelRouteChildren: PanelRouteChildren = {
   PanelDocumentosRoute: PanelDocumentosRoute,
   PanelMantencionesRoute: PanelMantencionesRoute,
   PanelPanelRoute: PanelPanelRoute,
+  PanelTalleresRoute: PanelTalleresRoute,
   PanelVehiculosRoute: PanelVehiculosRoute,
 }
 

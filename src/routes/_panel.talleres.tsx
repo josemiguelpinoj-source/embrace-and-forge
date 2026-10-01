@@ -65,11 +65,11 @@ function TalleresPage() {
           const dir = [t["addr:street"], t["addr:housenumber"], t["addr:city"]].filter(Boolean).join(" ");
           return {
             id: String(e.id),
-            nombre: t.name || t.brand || "Taller mecánico",
+            nombre: t["name"] || t["brand"] || "Taller mecánico",
             lat,
             lon,
             direccion: dir || null,
-            telefono: t.phone || null,
+            telefono: t["phone"] || null,
             clasificacion: null,
             distanciaKm: distanciaKm(c, { lat, lon }),
           } as Taller;

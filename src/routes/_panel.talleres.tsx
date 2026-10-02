@@ -111,7 +111,7 @@ function TalleresPage() {
         <div>
           <h1 className="font-display text-3xl font-semibold">Talleres cercanos</h1>
           <p className="text-muted-foreground">
-            Referencia: {esMiUbicacion ? "Mi ubicación" : "Santiago Centro"}
+            Puente alto
           </p>
         </div>
         <button

@@ -1,5 +1,21 @@
 import { useEffect } from "react";
-import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import fondoTaller from "@/assets/fondo-taller.jpg";
+import bannerPanel from "@/assets/banner-panel.jpg";
+import bannerVehiculos from "@/assets/banner-vehiculos.jpg";
+import bannerMantenciones from "@/assets/banner-mantenciones.jpg";
+import bannerDocumentos from "@/assets/banner-documentos.jpg";
+import bannerTalleres from "@/assets/banner-talleres.jpg";
+import bannerChecklist from "@/assets/banner-checklist.jpg";
+
+const banners: Record<string, string> = {
+  "/panel": bannerPanel,
+  "/vehiculos": bannerVehiculos,
+  "/mantenciones": bannerMantenciones,
+  "/documentos": bannerDocumentos,
+  "/talleres": bannerTalleres,
+  "/checklist": bannerChecklist,
+};
 import { useQueryClient } from "@tanstack/react-query";
 import { Car, ClipboardCheck, FileLock2, Gauge, LayoutDashboard, LogOut, MapPin, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +39,7 @@ const nav = [
 function PanelLayout() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -44,8 +61,17 @@ function PanelLayout() {
     );
   }
 
+  const banner = banners[pathname] ?? bannerPanel;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-0 bg-cover bg-center opacity-25"
+        style={{ backgroundImage: `url(${fondoTaller})` }}
+      />
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
+      <div className="relative z-10">
       <header className="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <Link to="/panel" className="flex items-center gap-2">
@@ -83,8 +109,13 @@ function PanelLayout() {
         </nav>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8">
+        <div className="relative mb-8 h-36 overflow-hidden rounded-xl border border-border md:h-48">
+          <img src={banner} alt="" width={1600} height={608} className="size-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-background/10 to-transparent" />
+        </div>
         <Outlet />
       </main>
+      </div>
     </div>
   );
 }

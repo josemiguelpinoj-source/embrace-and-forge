@@ -171,6 +171,48 @@ export type Database = {
         }
         Relationships: []
       }
+      talleres: {
+        Row: {
+          activo: boolean
+          comuna: string
+          created_at: string
+          direccion: string
+          horario: string
+          id: string
+          lat: number
+          lon: number
+          nombre: string
+          servicios: string[]
+          telefono: string | null
+        }
+        Insert: {
+          activo?: boolean
+          comuna: string
+          created_at?: string
+          direccion: string
+          horario: string
+          id?: string
+          lat: number
+          lon: number
+          nombre: string
+          servicios?: string[]
+          telefono?: string | null
+        }
+        Update: {
+          activo?: boolean
+          comuna?: string
+          created_at?: string
+          direccion?: string
+          horario?: string
+          id?: string
+          lat?: number
+          lon?: number
+          nombre?: string
+          servicios?: string[]
+          telefono?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

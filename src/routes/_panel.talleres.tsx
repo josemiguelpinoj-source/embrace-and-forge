@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useState } from "react";
-import { MapPin, Navigation, ShieldCheck } from "lucide-react";
+import { lazy, Suspense, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Clock, MapPin, Navigation, Phone, ShieldCheck, Wrench } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import type { Taller } from "@/components/MapaTalleres";
 
 const MapaTalleres = lazy(() => import("@/components/MapaTalleres"));
@@ -10,15 +12,15 @@ export const Route = createFileRoute("/_panel/talleres")({
   head: () => ({
     meta: [
       { title: "Talleres cercanos | AutoPlan" },
-      { name: "description", content: "Encuentra talleres mecánicos cercanos en un mapa." },
+      { name: "description", content: "Talleres cercanos con distancia, horario y servicios." },
       { property: "og:title", content: "Talleres cercanos | AutoPlan" },
-      { property: "og:description", content: "Encuentra talleres mecánicos cercanos en un mapa." },
+      { property: "og:description", content: "Talleres cercanos con distancia, horario y servicios." },
     ],
   }),
   component: TalleresPage,
 });
 
-const CENTRO_DEFECTO = { lat: -33.4372, lon: -70.6506 };
+const CENTRO_DEFECTO = { lat: -33.6117, lon: -70.5758 }; // Puente Alto
 
 function distanciaKm(a: { lat: number; lon: number }, b: { lat: number; lon: number }) {
   const R = 6371;
@@ -30,77 +32,66 @@ function distanciaKm(a: { lat: number; lon: number }, b: { lat: number; lon: num
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-type OsmElement = {
-  id: number;
-  lat?: number;
-  lon?: number;
-  center?: { lat: number; lon: number };
-  tags?: Record<string, string>;
-};
-
 function TalleresPage() {
   const [centro, setCentro] = useState(CENTRO_DEFECTO);
   const [esMiUbicacion, setEsMiUbicacion] = useState(false);
-  const [talleres, setTalleres] = useState<Taller[]>([]);
-  const [cargando, setCargando] = useState(false);
+  const [buscandoUbic, setBuscandoUbic] = useState(false);
+  const [servicio, setServicio] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  async function buscar(c: { lat: number; lon: number }) {
-    setCargando(true);
-    setError(null);
-    try {
-      const q = `[out:json][timeout:25];(node["shop"="car_repair"](around:6000,${c.lat},${c.lon});way["shop"="car_repair"](around:6000,${c.lat},${c.lon});node["craft"="car_repair"](around:6000,${c.lat},${c.lon}););out center 60;`;
-      const res = await fetch("https://overpass-api.de/api/interpreter", {
-        method: "POST",
-        body: "data=" + encodeURIComponent(q),
-      });
-      if (!res.ok) throw new Error("No se pudo consultar OpenStreetMap");
-      const json = (await res.json()) as { elements: OsmElement[] };
-      const lista: Taller[] = json.elements
-        .map((e) => {
-          const lat = e.lat ?? e.center?.lat;
-          const lon = e.lon ?? e.center?.lon;
-          if (lat == null || lon == null) return null;
-          const t = e.tags ?? {};
-          const dir = [t["addr:street"], t["addr:housenumber"], t["addr:city"]].filter(Boolean).join(" ");
-          return {
-            id: String(e.id),
-            nombre: t["name"] || t["brand"] || "Taller mecánico",
-            lat,
-            lon,
-            direccion: dir || null,
-            telefono: t["phone"] || null,
-            clasificacion: null,
-            distanciaKm: distanciaKm(c, { lat, lon }),
-          } as Taller;
-        })
-        .filter((x): x is Taller => x !== null)
-        .sort((a, b) => a.distanciaKm - b.distanciaKm);
-      setTalleres(lista);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al buscar talleres");
-    } finally {
-      setCargando(false);
-    }
-  }
+  const { data: filas = [], isLoading } = useQuery({
+    queryKey: ["talleres"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("talleres")
+        .select("id,nombre,direccion,comuna,telefono,lat,lon,horario,servicios")
+        .eq("activo", true);
+      if (error) throw error;
+      return data;
+    },
+  });
 
-  useEffect(() => {
-    buscar(CENTRO_DEFECTO);
-  }, []);
+  const servicios = useMemo(
+    () => Array.from(new Set(filas.flatMap((f) => f.servicios))).sort(),
+    [filas],
+  );
+
+  const talleres: Taller[] = useMemo(
+    () =>
+      filas
+        .filter((f) => !servicio || f.servicios.includes(servicio))
+        .map((f) => ({
+          id: f.id,
+          nombre: f.nombre,
+          lat: f.lat,
+          lon: f.lon,
+          direccion: `${f.direccion}, ${f.comuna}`,
+          telefono: f.telefono,
+          horario: f.horario,
+          servicios: f.servicios,
+          distanciaKm: distanciaKm(centro, f),
+        }))
+        .sort((a, b) => a.distanciaKm - b.distanciaKm),
+    [filas, centro, servicio],
+  );
 
   function usarMiUbicacion() {
     if (!navigator.geolocation) {
       setError("Tu navegador no permite geolocalización.");
       return;
     }
+    setBuscandoUbic(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const c = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-        setCentro(c);
+        setCentro({ lat: pos.coords.latitude, lon: pos.coords.longitude });
         setEsMiUbicacion(true);
-        buscar(c);
+        setError(null);
+        setBuscandoUbic(false);
       },
-      () => setError("No se pudo obtener tu ubicación; usamos Santiago Centro."),
+      () => {
+        setError("No se pudo obtener tu ubicación; usamos Puente Alto como referencia.");
+        setBuscandoUbic(false);
+      },
       { timeout: 10000, enableHighAccuracy: true },
     );
   }
@@ -111,15 +102,29 @@ function TalleresPage() {
         <div>
           <h1 className="font-display text-3xl font-semibold">Talleres cercanos</h1>
           <p className="text-muted-foreground">
-            Puente alto
+            {esMiUbicacion ? "Ordenados según tu ubicación" : "Puente alto"}
           </p>
         </div>
-        <button
-          onClick={usarMiUbicacion}
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-        >
-          <Navigation className="h-4 w-4" /> Buscar cerca de mí
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <select
+            value={servicio}
+            onChange={(e) => setServicio(e.target.value)}
+            className="rounded-md border border-border bg-card px-3 py-2 text-sm"
+            aria-label="Filtrar por servicio"
+          >
+            <option value="">Todos los servicios</option>
+            {servicios.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <button
+            onClick={usarMiUbicacion}
+            disabled={buscandoUbic}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-60"
+          >
+            <Navigation className="h-4 w-4" /> {buscandoUbic ? "Ubicando…" : "Buscar cerca de mí"}
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
@@ -129,19 +134,31 @@ function TalleresPage() {
       </Suspense>
 
       <div className="space-y-2">
-        {cargando && <p className="text-muted-foreground">Buscando talleres…</p>}
-        {!cargando && talleres.length === 0 && (
-          <p className="text-muted-foreground">No se encontraron talleres en 6 km.</p>
+        {isLoading && <p className="text-muted-foreground">Cargando talleres…</p>}
+        {!isLoading && talleres.length === 0 && (
+          <p className="text-muted-foreground">No hay talleres con ese servicio.</p>
         )}
         {talleres.slice(0, 20).map((t) => (
-          <div key={t.id} className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
-            <div>
-              <p className="font-medium">{t.nombre}</p>
-              <p className="text-sm text-muted-foreground">
-                <MapPin className="mr-1 inline h-3 w-3" />
-                {t.direccion ?? "Sin dirección"} · {t.distanciaKm.toFixed(1)} km
-                {t.telefono ? ` · ${t.telefono}` : ""}
+          <div key={t.id} className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-card p-4">
+            <div className="space-y-1">
+              <p className="font-medium">
+                {t.nombre}{" "}
+                <span className="font-mono text-sm text-primary">{t.distanciaKm.toFixed(1)} km</span>
               </p>
+              <p className="text-sm text-muted-foreground">
+                <MapPin className="mr-1 inline h-3 w-3" />{t.direccion}
+                {t.telefono && (<> · <Phone className="mx-1 inline h-3 w-3" />{t.telefono}</>)}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <Clock className="mr-1 inline h-3 w-3" />{t.horario}
+              </p>
+              <div className="flex flex-wrap gap-1 pt-1">
+                {t.servicios.map((s) => (
+                  <span key={s} className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs">
+                    <Wrench className="h-3 w-3" />{s}
+                  </span>
+                ))}
+              </div>
             </div>
             <a
               href={`https://www.google.com/maps/dir/?api=1&destination=${t.lat},${t.lon}`}
@@ -157,7 +174,7 @@ function TalleresPage() {
 
       <div className="flex gap-3 rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
         <ShieldCheck className="h-5 w-5 shrink-0 text-primary" />
-        Tu ubicación solo se usa localmente en tu navegador para consultar OpenStreetMap. No se guarda ni se comparte.
+        Tu ubicación solo se usa en tu navegador para calcular distancias. No se guarda ni se comparte.
       </div>
     </div>
   );

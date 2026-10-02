@@ -19,7 +19,8 @@ export type Taller = {
   lon: number;
   direccion: string | null;
   telefono: string | null;
-  clasificacion: number | null;
+  horario: string;
+  servicios: string[];
   distanciaKm: number;
 };
 
@@ -50,7 +51,10 @@ export default function MapaTalleres({
             {t.direccion ?? "Sin dirección registrada"}
             <br />
             {t.distanciaKm.toFixed(1)} km
-            {t.clasificacion ? ` · ${t.clasificacion.toFixed(1)}★` : " · sin clasificación"}
+            <br />
+            {t.horario}
+            <br />
+            {t.servicios.join(", ")}
           </Popup>
         </Marker>
       ))}

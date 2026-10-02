@@ -8,6 +8,13 @@
       "when": 1790805258377,
       "tag": "0000_autoplan_core_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790975249396,
+      "tag": "0001_talleres_directorio",
+      "breakpoints": true
     }
   ]
 }

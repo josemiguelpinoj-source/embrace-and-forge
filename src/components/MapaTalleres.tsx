@@ -27,9 +27,11 @@ export type Taller = {
 export default function MapaTalleres({
   centro,
   talleres,
+  esMiUbicacion = false,
 }: {
   centro: { lat: number; lon: number };
   talleres: Taller[];
+  esMiUbicacion?: boolean;
 }) {
   return (
     <MapContainer
@@ -42,7 +44,9 @@ export default function MapaTalleres({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Circle center={[centro.lat, centro.lon]} radius={120} />
+      <Circle center={[centro.lat, centro.lon]} radius={120}>
+        <Popup>{esMiUbicacion ? "Tu ubicación" : "Referencia: Puente Alto"}</Popup>
+      </Circle>
       {talleres.map((t) => (
         <Marker key={t.id} position={[t.lat, t.lon]} icon={icono}>
           <Popup>
@@ -50,7 +54,7 @@ export default function MapaTalleres({
             <br />
             {t.direccion ?? "Sin dirección registrada"}
             <br />
-            {t.distanciaKm.toFixed(1)} km
+            A {t.distanciaKm.toFixed(1)} km
             <br />
             {t.horario}
             <br />

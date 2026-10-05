@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, MapPin, Navigation, Phone, ShieldCheck, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,7 +76,7 @@ function TalleresPage() {
   );
 
   function usarMiUbicacion() {
-    if (!navigator.geolocation) {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
       setError("Tu navegador no permite geolocalización.");
       return;
     }
@@ -88,13 +88,23 @@ function TalleresPage() {
         setError(null);
         setBuscandoUbic(false);
       },
-      () => {
-        setError("No se pudo obtener tu ubicación; usamos Puente Alto como referencia.");
+      (err) => {
+        setError(
+          err.code === err.PERMISSION_DENIED
+            ? "Permiso de ubicación denegado. Actívalo en tu navegador; mientras tanto usamos Puente Alto."
+            : "No se pudo obtener tu ubicación; usamos Puente Alto como referencia.",
+        );
         setBuscandoUbic(false);
       },
-      { timeout: 10000, enableHighAccuracy: true },
+      { timeout: 15000, enableHighAccuracy: true, maximumAge: 60000 },
     );
   }
+
+  // Solicita la ubicación real automáticamente al abrir la página
+  useEffect(() => {
+    usarMiUbicacion();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -102,7 +112,9 @@ function TalleresPage() {
         <div>
           <h1 className="font-display text-3xl font-semibold">Talleres cercanos</h1>
           <p className="text-muted-foreground">
-            {esMiUbicacion ? "Ordenados según tu ubicación" : "Puente alto"}
+            {esMiUbicacion
+              ? "Distancias en km desde tu ubicación actual"
+              : "Distancias en km desde Puente Alto"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -130,7 +142,7 @@ function TalleresPage() {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <Suspense fallback={<div className="h-[420px] rounded-xl bg-muted" />}>
-        <MapaTalleres key={`${centro.lat},${centro.lon}`} centro={centro} talleres={talleres} />
+        <MapaTalleres key={`${centro.lat},${centro.lon}`} centro={centro} talleres={talleres} esMiUbicacion={esMiUbicacion} />
       </Suspense>
 
       <div className="space-y-2">
